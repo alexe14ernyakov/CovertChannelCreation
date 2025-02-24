@@ -1,5 +1,6 @@
 import argparse
 import multiprocessing
+import time
 
 import source as s
 import destination as d
@@ -17,12 +18,20 @@ def main():
 
     client_process = multiprocessing.Process(target=d.init_client, args=(dport,))
     server_process = multiprocessing.Process(target=s.init_server, args=(dport,))
+    client_process.daemon = True
+    server_process.daemon = True
 
     client_process.start()
     server_process.start()
 
-    client_process.join()
-    server_process.join()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        client_process.terminate()
+        server_process.terminate()
+        client_process.join()
+        server_process.join()
 
 
 if __name__ == "__main__":
