@@ -6,20 +6,21 @@ import string
 
 
 DESTINATION_IP = '127.0.0.1'
-SENDING_INTERVAL = 2
 MIN_PACKET_SIZE = 5
 MAX_PACKET_SIZE = 100
+ZERO_DELAY_K = 0.8
+ONE_DELAY_K = 1.2
 
 
-def init_server(port: int, msg: str | None):
+def init_server(port: int, interval: int, msg: str | None):
     sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     address = (DESTINATION_IP, port)
     print(f"SERVER   |   Initialized packet sending to {DESTINATION_IP}:{port}")
 
     msg_queue = multiprocessing.Queue()
 
-    generator_process = multiprocessing.Process(target=message_generator, args=(msg_queue,))
-    sender_process = multiprocessing.Process(target=message_sender, args=(sock, address, msg_queue, msg))
+    generator_process = multiprocessing.Process(target=message_generator, args=(msg_queue, interval))
+    sender_process = multiprocessing.Process(target=message_sender, args=(sock, address, msg_queue, interval, msg))
 
     generator_process.start()
     sender_process.start()
@@ -28,21 +29,21 @@ def init_server(port: int, msg: str | None):
     sender_process.join()
                 
 
-def message_generator(queue: multiprocessing.Queue):
+def message_generator(queue: multiprocessing.Queue, interval: int):
     while True:
         message = random_message()
         queue.put(message)
-        time.sleep(SENDING_INTERVAL)
+        time.sleep(interval)
 
 
-def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Queue, secret: str):
+def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Queue, interval: int, secret: str):
     while True:
         if bool(secret):
             bin_msg = bin_string(secret)
 
             for bit in bin_msg:
                 if bit == '0':
-                    time.sleep(SENDING_INTERVAL * 0.5)
+                    time.sleep(ZERO_DELAY_K * interval)
                     
                     if not buffer.empty():
                         message = buffer.get()
@@ -50,7 +51,7 @@ def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Q
                         message = 'FICTITIOUS' + random_message()
                     send_packet(socket, message, addr)
                 else:
-                    time.sleep(SENDING_INTERVAL * 1.5)
+                    time.sleep(ONE_DELAY_K * interval)
 
                     if not buffer.empty():
                         message = buffer.get()
@@ -59,7 +60,7 @@ def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Q
                     send_packet(socket, message, addr)
             secret = None
         else:
-            time.sleep(SENDING_INTERVAL)
+            time.sleep(interval)
             if not buffer.empty():
                 message = buffer.get()
                 send_packet(socket, message, addr)

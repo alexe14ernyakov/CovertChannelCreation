@@ -3,10 +3,9 @@ import time
 
 HOST = '0.0.0.0'
 BUFFER_SIZE = 1500
-NETWORK_DELAY = 2
 
 
-def init_client(port: int, covchan: bool):
+def init_client(port: int, interval: int, covchan: bool):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.bind((HOST, port))
         print(f"CLIENT   |   Listen for messages on port {port}")
@@ -19,10 +18,14 @@ def init_client(port: int, covchan: bool):
                 receive_packet(sock)
                 t2: float = time.time()
                 delay = t2 - t1
+                print(delay)
                 t1 = t2
 
-                bit = "0" if delay < NETWORK_DELAY else "1"
+                bit = "0" if delay < interval else "1"
                 secret += bit
+                fs = f"{secret:*<48}"
+                for i in range(6):
+                    print(fs[i*8:8*i+8])
 
                 if len(secret) % 8 == 0:
                     decoded_secret: str = bin_to_str(secret)
