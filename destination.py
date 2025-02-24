@@ -19,7 +19,6 @@ def init_client(port: int, covchan: bool):
                 receive_packet(sock)
                 t2: float = time.time()
                 delay = t2 - t1
-                print(f"Delay: {delay}")
                 t1 = t2
 
                 bit = "0" if delay < NETWORK_DELAY else "1"
@@ -36,7 +35,7 @@ def init_client(port: int, covchan: bool):
 
 def receive_packet(socket: socket.socket):
     data, addr = socket.recvfrom(BUFFER_SIZE)
-    #print(f"CLIENT   |   Received message from {addr[0]:>10}:{addr[1]:<5} : '{data.decode()}'")
+    print(f"CLIENT   |   Received message from {addr[0]:>10}:{addr[1]:<5} : '{data.decode()}'")
 
 
 def bin_to_str(bin_str: str) -> str:
