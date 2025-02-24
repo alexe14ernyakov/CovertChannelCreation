@@ -14,12 +14,12 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
+
+    secret_message = args.msg
     dport = args.dport
 
-    client_process = multiprocessing.Process(target=d.init_client, args=(dport,))
-    server_process = multiprocessing.Process(target=s.init_server, args=(dport,))
-    client_process.daemon = True
-    server_process.daemon = True
+    client_process = multiprocessing.Process(target=d.init_client, args=(dport, True if secret_message else False))
+    server_process = multiprocessing.Process(target=s.init_server, args=(dport, secret_message))
 
     client_process.start()
     server_process.start()
