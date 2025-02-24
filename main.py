@@ -10,7 +10,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Covert channel emulation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-m', '--message', help='Data to transfer via covert channel', required=False, dest='msg', type=str)
     parser.add_argument('-dp', '--destination_port', help='Listening port at client-side', required=False, dest='dport', type=int, default=1337)
-    parser.add_argument('-i', '--interval', help='Interval between packet sending in network in regular mode', required=False, dest='interval', type=int, default=1)
+    parser.add_argument('-i', '--interval', help='Interval between packet sending in network in regular mode', required=False, dest='interval', type=float, default=1)
     return parser.parse_args()
 
 def main():

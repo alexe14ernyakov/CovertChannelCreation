@@ -3,6 +3,7 @@ import time
 
 HOST = '0.0.0.0'
 BUFFER_SIZE = 1500
+BASE_CHARACTER = str(chr(int('11111111', 2)))
 
 
 def init_client(port: int, interval: int, covchan: bool):
@@ -18,19 +19,17 @@ def init_client(port: int, interval: int, covchan: bool):
                 receive_packet(sock)
                 t2: float = time.time()
                 delay = t2 - t1
-                print(delay)
                 t1 = t2
 
                 bit = "0" if delay < interval else "1"
                 secret += bit
-                fs = f"{secret:*<48}"
-                for i in range(6):
-                    print(fs[i*8:8*i+8])
 
                 if len(secret) % 8 == 0:
                     decoded_secret: str = bin_to_str(secret)
-                    if decoded_secret:
-                        print(f"CLIENT   |   New character of secret received : {decoded_secret}")        
+                    if decoded_secret and decoded_secret[-1] != BASE_CHARACTER:
+                        print(f"CLIENT   |   New character of secret received       : '{decoded_secret}'")
+                    else:
+                        print(f"CLIENT   |   Secret fully received: '{decoded_secret.split(BASE_CHARACTER)[0]}'")    
         else:
             while True:
                 receive_packet(sock)
