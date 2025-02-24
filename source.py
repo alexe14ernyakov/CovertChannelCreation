@@ -66,6 +66,7 @@ def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Q
                     else:
                         message = 'FICTITIOUS' + random_message()
                     send_packet(socket, message, addr)
+            secret = None
         else:
             time.sleep(SENDING_INTERVAL)
             if not buffer.empty():
@@ -76,7 +77,7 @@ def message_sender(socket: socket.socket, addr: tuple, buffer: multiprocessing.Q
 def send_packet(socket: socket.socket, text: str, addr: tuple):
     try:
         socket.sendto(text.encode(), addr)
-        print(f"SERVER   |   Send message to       {addr[0]:>10}:{addr[1]:<5} : '{text}'")
+        #print(f"SERVER   |   Send message to       {addr[0]:>10}:{addr[1]:<5} : '{text}'")
     except Exception as e:
         print(f"SERVER   |   ERROR: {e}")
 
